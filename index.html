@@ -160,6 +160,20 @@ textarea[readonly] { opacity: .55; cursor: default; }
 .hi-mode { font-size: 11px; color: var(--text3); margin-top: 2px; }
 .hi-empty { font-size: 12px; color: var(--text3); text-align: center; padding: 20px 0; }
 
+/* ─── Existing entry banner ─── */
+.existing-banner {
+  font-size: 12px; color: var(--text3);
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 14px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.view-hist-btn {
+  background: none; border: none; color: var(--gold);
+  font-size: 12px; font-family: inherit; cursor: pointer; padding: 0;
+  text-decoration: underline; flex-shrink: 0;
+}
+.view-hist-btn:hover { opacity: .8; }
+
 /* ─── Celebration ─── */
 @keyframes popIn { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .celebration {
@@ -201,7 +215,7 @@ textarea[readonly] { opacity: .55; cursor: default; }
 
 <script>
 // ── State ──
-const S = { mode:'daily', viewKey:null, sbOpen:false, timer:null };
+const S = { mode:'daily', viewKey:null, sbOpen:false, timer:null, dirty:false };
 
 // ── Date utils ──
 const p2 = n => String(n).padStart(2,'0');
@@ -307,8 +321,8 @@ function toast(msg){
 // ── Render main ──
 function renderMain(){
   const key=activeKey(), entry=getE(S.mode,key);
-  const isPast=S.viewKey&&S.viewKey!==nowKey();
-  const ro=isPast?'readonly':'';
+  const isPast = S.viewKey !== null;   // any viewKey = history mode
+  const ro = isPast ? 'readonly' : '';
   const ML={daily:'每日复盘',weekly:'每周复盘',monthly:'每月校准'};
   const TL={daily:'5 分钟',weekly:'20 分钟',monthly:'1 小时'};
 
@@ -334,10 +348,18 @@ function renderMain(){
 
   h+=`<div class="sec-bar"><div class="sec-left"><div class="sec-title">${ML[S.mode]}</div><span class="badge badge-time">${TL[S.mode]}</span>${badge}</div>${dots}</div>`;
 
+  // Banner: today already has a saved entry
+  const ids = S.mode==='monthly' ? FW.map(f=>f.id) : (QS[S.mode]||[]).map(q=>q.id);
+  const hasExisting = !isPast && ids.some(id=>hasFill(entry[id]));
+  if(hasExisting){
+    h+=`<div class="existing-banner">今日已有记录，新内容保存后将覆盖。<button class="view-hist-btn" id="viewHistBtn">查看历史</button></div>`;
+  }
+
   if(S.mode!=='monthly'){
     QS[S.mode].forEach(q=>{
-      const v=entry[q.id]||'', done=hasFill(v);
-      h+=`<div class="q-card ${done?'done':''}" id="card-${q.id}">
+      // History view: show saved content. Today's form: always blank
+      const v = isPast ? (entry[q.id]||'') : '';
+      h+=`<div class="q-card" id="card-${q.id}">
         <div class="q-head"><div class="q-num">${q.n}</div><div class="q-lbl">${q.icon} ${q.label}</div></div>
         <div class="q-hint">${q.hint}</div>
         <textarea data-id="${q.id}" rows="${q.rows}" placeholder="${q.ph}" ${ro}>${esc(v)}</textarea>
@@ -345,7 +367,7 @@ function renderMain(){
     });
   } else {
     FW.forEach(f=>{
-      const v=entry[f.id]||'';
+      const v = isPast ? (entry[f.id]||'') : '';
       h+=`<div class="fw-card"><div class="fw-tag">${f.label}</div><div class="fw-sub">${f.desc}</div><textarea data-id="${f.id}" rows="${f.rows}" placeholder="${f.ph}" ${ro}>${esc(v)}</textarea></div>`;
     });
   }
@@ -361,8 +383,15 @@ function renderMain(){
   if(!isPast){
     document.getElementById('saveBtn').addEventListener('click',manualSave);
     document.getElementById('exportBtn').addEventListener('click',exportMd);
+    document.getElementById('viewHistBtn')?.addEventListener('click',()=>{
+      S.sbOpen=true;
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('histBtn').textContent='关闭';
+      renderSidebar();
+    });
     document.querySelectorAll('textarea[data-id]').forEach(ta=>{
       ta.addEventListener('input',()=>{
+        S.dirty=true;
         const card=document.getElementById('card-'+ta.dataset.id);
         if(card) card.classList.toggle('done',hasFill(ta.value));
         if(S.mode==='daily') refreshDots();
@@ -391,7 +420,7 @@ function renderSidebar(){
   if(!keys.length){ el.innerHTML='<div class="hi-empty">还没有记录</div>'; return; }
   el.innerHTML=keys.map(k=>`<div class="hi-item ${k===cur?'on':''}" data-k="${k}"><div class="hi-date">${fmtKey(k)}</div><div class="hi-mode">${ML[S.mode]}</div></div>`).join('');
   el.querySelectorAll('.hi-item').forEach(it=>{
-    it.addEventListener('click',()=>{ S.viewKey=it.dataset.k===nowKey()?null:it.dataset.k; refresh(); });
+    it.addEventListener('click',()=>{ S.viewKey=it.dataset.k; refresh(); });
   });
 }
 
@@ -405,6 +434,7 @@ function renderStreak(){
 
 // ── Refresh ──
 function refresh(){
+  S.dirty=false;
   document.getElementById('dateChip').textContent=fmtKey(activeKey());
   renderMain(); renderStreak();
   if(S.sbOpen) renderSidebar();
@@ -427,6 +457,7 @@ function manualSave(){
 }
 
 function debounceSave(){
+  if(!S.dirty) return;
   clearTimeout(S.timer);
   S.timer=setTimeout(()=>{ setE(S.mode,activeKey(),collect()); renderStreak(); if(S.sbOpen) renderSidebar(); },900);
 }
