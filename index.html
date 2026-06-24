@@ -8,18 +8,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0c0c0c;
-  --surface: #141414;
-  --surface2: #1c1c1c;
-  --border: #242424;
-  --border2: #2e2e2e;
-  --text: #e8e8e8;
-  --text2: #a0a0a0;
-  --text3: #555;
-  --accent: #22c55e;
-  --accent-bg: rgba(34,197,94,0.07);
-  --accent-border: rgba(34,197,94,0.2);
-  --r: 8px;
+  --bg: #0f1117;
+  --surface: #161d2c;
+  --surface2: #1e2840;
+  --border: #2a3550;
+  --border2: #3d4f6a;
+  --text: #dde4f0;
+  --text2: #8896b0;
+  --text3: #4a5670;
+  --gold: #f0a830;
+  --gold-dim: rgba(240,168,48,.1);
+  --gold-border: rgba(240,168,48,.26);
+  --mint: #4ade80;
+  --mint-dim: rgba(74,222,128,.1);
+  --r: 10px; --r2: 14px;
 }
 
 body {
@@ -32,127 +34,160 @@ body {
   line-height: 1.65;
 }
 
+/* ─── Toast ─── */
+.toast {
+  position: fixed; top: 0; left: 50%;
+  transform: translateX(-50%) translateY(-70px);
+  background: #052e16; color: var(--mint);
+  border: 1px solid rgba(74,222,128,.35);
+  padding: 10px 24px; border-radius: 0 0 14px 14px;
+  font-size: 14px; font-weight: 600; z-index: 999;
+  transition: transform .32s cubic-bezier(.34,1.56,.64,1);
+  white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,.5);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
 /* ─── Header ─── */
 header {
   position: sticky; top: 0; z-index: 50;
-  background: var(--surface);
+  background: rgba(15,17,23,.94);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-  height: 52px;
+  padding: 0 20px; height: 56px;
   display: flex; align-items: center; gap: 14px;
 }
-.logo { font-size: 14px; font-weight: 600; color: var(--accent); letter-spacing: -.01em; flex-shrink: 0; }
+.hdr-l { display: flex; align-items: center; gap: 10px; }
+.logo { font-size: 15px; font-weight: 700; color: var(--gold); letter-spacing: -.01em; }
 
-.tabs { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 3px; gap: 2px; }
-.tab {
-  background: none; border: none; color: var(--text3);
-  padding: 5px 13px; border-radius: 5px; cursor: pointer;
-  font-size: 13px; font-family: inherit; transition: all .12s; white-space: nowrap;
+.streak {
+  font-size: 12px; color: var(--text3);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3px 10px;
 }
+.streak.hot { color: #fb923c; border-color: rgba(251,146,60,.3); }
+
+.tabs { display: flex; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+.tab { background: none; border: none; color: var(--text3); padding: 5px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-family: inherit; transition: all .12s; }
 .tab:hover { color: var(--text2); }
 .tab.on { background: var(--surface2); color: var(--text); }
 
-.date-chip {
-  font-size: 12px; color: var(--text3);
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 20px; padding: 3px 10px; white-space: nowrap;
-}
-
 .hdr-r { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.save-lbl { font-size: 12px; color: var(--text3); min-width: 56px; text-align: right; }
-.save-lbl.ok { color: var(--accent); }
-
-.hist-btn {
-  background: none; border: 1px solid var(--border); color: var(--text3);
-  padding: 5px 11px; border-radius: 6px; cursor: pointer;
-  font-size: 12px; font-family: inherit; transition: all .12s; white-space: nowrap;
-}
-.hist-btn:hover { color: var(--text2); border-color: var(--border2); }
+.date-chip { font-size: 12px; color: var(--text3); background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; white-space: nowrap; }
+.icon-btn { background: none; border: 1px solid var(--border); color: var(--text3); padding: 5px 11px; border-radius: 6px; cursor: pointer; font-size: 12px; font-family: inherit; transition: all .12s; }
+.icon-btn:hover { color: var(--text2); border-color: var(--border2); }
 
 /* ─── Shell ─── */
-.shell { display: flex; min-height: calc(100vh - 52px); }
+.shell { display: flex; min-height: calc(100vh - 56px); }
 
 /* ─── Main ─── */
-main {
-  flex: 1; min-width: 0;
-  padding: 28px 24px 60px;
-  max-width: 700px; margin: 0 auto; width: 100%;
-}
+main { flex: 1; min-width: 0; padding: 28px 24px 60px; max-width: 720px; margin: 0 auto; width: 100%; }
 
-.formula {
-  background: var(--accent-bg); border: 1px solid var(--accent-border);
-  border-radius: var(--r); padding: 11px 16px;
-  margin-bottom: 28px; text-align: center; line-height: 1.85;
+/* ─── Quote ─── */
+.quote-band {
+  position: relative; overflow: hidden;
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  border-radius: var(--r2); padding: 16px 18px; margin-bottom: 26px;
 }
-.formula .eq { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: -.01em; }
-.formula .sub { font-size: 11px; color: var(--text3); }
+.quote-band::after {
+  content: '❝'; position: absolute; top: 4px; right: 14px;
+  font-size: 56px; color: var(--gold); opacity: .1;
+  line-height: 1; pointer-events: none;
+}
+.quote-text { font-size: 14px; color: var(--text); line-height: 1.75; }
+.quote-src { font-size: 11px; color: var(--text3); margin-top: 5px; }
 
-.sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+/* ─── Section header ─── */
+.sec-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.sec-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .sec-title { font-size: 16px; font-weight: 600; letter-spacing: -.02em; }
-.badge {
-  font-size: 11px; color: var(--text3);
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 20px; padding: 2px 8px;
-}
-.badge.past { color: #f97316; border-color: rgba(249,115,22,.3); }
+.badge { font-size: 11px; padding: 2px 9px; border-radius: 20px; border: 1px solid; white-space: nowrap; }
+.badge-time  { color: var(--text3); background: var(--surface); border-color: var(--border); }
+.badge-done  { color: var(--mint); background: var(--mint-dim); border-color: rgba(74,222,128,.3); }
+.badge-wip   { color: var(--gold); background: var(--gold-dim); border-color: var(--gold-border); }
+.badge-past  { color: #fb923c; background: rgba(251,146,60,.08); border-color: rgba(251,146,60,.3); }
 
-.q-block { margin-bottom: 20px; }
-.q-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; }
-.q-hint { display: block; font-size: 12px; color: var(--text3); margin-bottom: 8px; line-height: 1.55; }
+.prog-wrap { display: flex; align-items: center; gap: 5px; }
+.prog-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--border); transition: all .2s; }
+.prog-dot.on { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 6px rgba(240,168,48,.4); }
+
+/* ─── Question cards ─── */
+.q-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--r2); padding: 16px 18px; margin-bottom: 13px;
+  transition: border-left-color .2s;
+}
+.q-card:focus-within { border-left-color: var(--gold); }
+.q-card.done { border-left-color: rgba(74,222,128,.45); }
+
+.q-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.q-num { width: 22px; height: 22px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); font-size: 11px; font-weight: 600; color: var(--text2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.q-lbl { font-size: 13.5px; font-weight: 500; }
+.q-hint { font-size: 12px; color: var(--text3); margin-bottom: 10px; line-height: 1.55; }
 
 textarea {
-  width: 100%; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r); color: var(--text);
-  font-size: 13.5px; font-family: inherit; line-height: 1.7;
-  padding: 11px 13px; resize: vertical; min-height: 76px;
-  outline: none; transition: border-color .15s;
+  width: 100%; background: transparent; border: none; outline: none;
+  color: var(--text); font-size: 13.5px; font-family: inherit;
+  line-height: 1.75; resize: none; min-height: 68px;
+  border-top: 1px dashed var(--border); padding-top: 10px;
 }
-textarea:focus { border-color: var(--accent); }
 textarea::placeholder { color: var(--text3); }
 textarea[readonly] { opacity: .55; cursor: default; }
 
-.fw-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 14px; }
-.fw-lbl { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
-.fw-desc { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
+/* ─── Flywheel cards ─── */
+.fw-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid rgba(74,222,128,.3); border-radius: var(--r2); padding: 16px 18px; margin-bottom: 13px; }
+.fw-card:focus-within { border-left-color: var(--gold); }
+.fw-tag { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+.fw-sub { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
 
-.bot { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--border); }
-.btn { background: none; border: 1px solid var(--border); color: var(--text2); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-family: inherit; transition: all .12s; }
+/* ─── Bottom bar ─── */
+.bot { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); }
+.bot-hint { font-size: 12px; color: var(--text3); }
+.btn-row { display: flex; gap: 8px; }
+.btn { background: none; border: 1px solid var(--border); color: var(--text2); padding: 8px 16px; border-radius: 7px; cursor: pointer; font-size: 13px; font-family: inherit; transition: all .12s; }
 .btn:hover { color: var(--text); border-color: var(--border2); }
-.btn.pri { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 500; }
+.btn.pri { background: var(--gold); border-color: var(--gold); color: #1a1000; font-weight: 600; }
 .btn.pri:hover { opacity: .88; }
 
 /* ─── Sidebar ─── */
-.sidebar {
-  width: 230px; flex-shrink: 0;
-  border-left: 1px solid var(--border); background: var(--surface);
-  padding: 18px 13px; display: none; overflow-y: auto;
-  max-height: calc(100vh - 52px); position: sticky; top: 52px;
-}
+.sidebar { width: 230px; flex-shrink: 0; border-left: 1px solid var(--border); background: var(--surface); padding: 18px 13px; display: none; overflow-y: auto; max-height: calc(100vh - 56px); position: sticky; top: 56px; }
 .sidebar.open { display: block; }
 .sb-ttl { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 14px; }
-
-.hi-item { padding: 9px 11px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 7px; cursor: pointer; transition: all .12s; }
+.hi-item { padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 7px; cursor: pointer; transition: all .12s; }
 .hi-item:hover { border-color: var(--border2); }
-.hi-item.on { border-color: var(--accent); background: var(--accent-bg); }
+.hi-item.on { border-color: var(--gold); background: var(--gold-dim); }
 .hi-date { font-size: 13px; font-weight: 500; }
 .hi-mode { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.empty { font-size: 12px; color: var(--text3); text-align: center; padding: 20px 0; }
+.hi-empty { font-size: 12px; color: var(--text3); text-align: center; padding: 20px 0; }
+
+/* ─── Celebration ─── */
+@keyframes popIn { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.celebration {
+  text-align: center; padding: 32px 20px;
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.cel-icon { font-size: 48px; margin-bottom: 12px; }
+.cel-title { font-size: 18px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+.cel-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
 </style>
 </head>
 <body>
 
+<div id="toast" class="toast"></div>
+
 <header>
-  <div class="logo">成长复盘</div>
+  <div class="hdr-l">
+    <div class="logo">✦ 成长复盘</div>
+    <div id="streakEl" class="streak"></div>
+  </div>
   <div class="tabs">
     <button class="tab on" data-m="daily">每日</button>
     <button class="tab" data-m="weekly">每周</button>
     <button class="tab" data-m="monthly">每月</button>
   </div>
-  <div class="date-chip" id="dateChip"></div>
   <div class="hdr-r">
-    <span class="save-lbl" id="saveLbl"></span>
-    <button class="hist-btn" id="exportBtn">导出</button>
-    <button class="hist-btn" id="histBtn">历史</button>
+    <div id="dateChip" class="date-chip"></div>
+    <button class="icon-btn" id="histBtn">历史</button>
   </div>
 </header>
 
@@ -168,7 +203,7 @@ textarea[readonly] { opacity: .55; cursor: default; }
 // ── State ──
 const S = { mode:'daily', viewKey:null, sbOpen:false, timer:null };
 
-// ── Date helpers ──
+// ── Date utils ──
 const p2 = n => String(n).padStart(2,'0');
 function dayKey(d){ d=d||new Date(); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; }
 function wkKey(d){
@@ -181,12 +216,8 @@ function wkKey(d){
 function moKey(d){ d=d||new Date(); return `${d.getFullYear()}-${p2(d.getMonth()+1)}`; }
 function nowKey(){ return S.mode==='daily'?dayKey():S.mode==='weekly'?wkKey():moKey(); }
 function activeKey(){ return S.viewKey||nowKey(); }
-
 function fmtKey(k){
-  if(/^\d{4}-\d{2}-\d{2}$/.test(k)){
-    const d=new Date(k+'T00:00:00');
-    return `${d.getMonth()+1}月${d.getDate()}日 周${'日一二三四五六'[d.getDay()]}`;
-  }
+  if(/^\d{4}-\d{2}-\d{2}$/.test(k)){ const d=new Date(k+'T00:00:00'); return `${d.getMonth()+1}月${d.getDate()}日 周${'日一二三四五六'[d.getDay()]}`; }
   if(/^\d{4}-W\d+$/.test(k)){ const[y,w]=k.split('-W'); return `${y}年 第${+w}周`; }
   if(/^\d{4}-\d{2}$/.test(k)){ const[y,m]=k.split('-'); return `${y}年${+m}月`; }
   return k;
@@ -206,234 +237,242 @@ function setE(mode,key,patch){
 // ── Questions ──
 const QS={
   daily:[
-    {id:'q1',n:'1',label:'今日有效增量',
-     hint:'今天什么改变了我下次行动的质量？（没有就写「无」）',
-     ph:'例：把复利框架用在了工作安排上，思路清楚多了。',rows:4},
-    {id:'q2',n:'2',label:'今日判断记录',
-     hint:'记一个判断，注明依据。隔段时间回来看：对了还是错了？',
-     ph:'判断：___\n依据：___',rows:4},
-    {id:'q3',n:'3',label:'今日输出',
-     hint:'完成了什么？文章 / 结构图 / 工作流 / 复盘记录……哪怕一小段。',
-     ph:'今天输出了……',rows:3},
+    {id:'q1',n:'1',icon:'💡',label:'今日有效增量',hint:'今天什么改变了我下次行动的质量？',ph:'例：把某个方法真正用上了，思路更清晰了……',rows:4},
+    {id:'q2',n:'2',icon:'🎯',label:'今日判断记录',hint:'记一个判断，注明依据——后续回来验证对错。',ph:'判断：___\n依据：___',rows:4},
+    {id:'q3',n:'3',icon:'📤',label:'今日输出',hint:'完成了什么？文章 / 结构图 / 工作流 / 复盘记录……',ph:'今天输出了……',rows:3},
   ],
   weekly:[
-    {id:'q1',n:'1',label:'本周有效存量',
-     hint:'新增了什么有效存量？不是「学了什么」，而是「因此改变了什么」。',
-     ph:'本周沉淀下来、下次能直接调用的……',rows:5},
-    {id:'q2',n:'2',label:'判断复盘',
-     hint:'修正了哪个错误判断？错在哪里（信息不足 / 逻辑错 / 情绪干扰 / 低估变量）？',
-     ph:'原判断：___\n实际结果：___\n错误来源：___',rows:5},
-    {id:'q3',n:'3',label:'可复用产出',
-     hint:'产出了什么可以复用的东西？（流程、模板、框架、文章…）',
-     ph:'这件事下次还能用上，因为……',rows:3},
-    {id:'q4',n:'4',label:'熵增来源',
-     hint:'本周主要被什么消耗了？',
-     ph:'□ 认知衰减（学了没用）\n□ 注意力衰减（碎片信息）\n□ 情绪衰减（焦虑内耗）\n□ 方向衰减（忙但不知为何）\n\n具体：',rows:5},
-    {id:'q5',n:'5',label:'下周',
-     hint:'聚焦什么？减少什么？',
-     ph:'聚焦：___\n减少：___',rows:3},
+    {id:'q1',n:'1',icon:'📦',label:'本周有效存量',hint:'新增了什么有效存量？不是「学了什么」，而是「因此改变了什么」。',ph:'本周沉淀下来、下次能直接调用的……',rows:5},
+    {id:'q2',n:'2',icon:'🔍',label:'判断复盘',hint:'修正了哪个错误判断？错在哪里？',ph:'原判断：___\n实际结果：___\n错误来源：___',rows:5},
+    {id:'q3',n:'3',icon:'♻️',label:'可复用产出',hint:'产出了什么可以复用的东西？',ph:'这件事下次还能用上，因为……',rows:3},
+    {id:'q4',n:'4',icon:'🌀',label:'熵增来源',hint:'本周主要被什么消耗了？',ph:'□ 认知衰减  □ 注意力衰减  □ 情绪衰减  □ 方向衰减\n\n具体：',rows:5},
+    {id:'q5',n:'5',icon:'📌',label:'下周计划',hint:'聚焦什么？减少什么？',ph:'聚焦：___\n减少：___',rows:3},
   ],
 };
-
 const FW=[
-  {id:'fw1',label:'认知飞轮',desc:'输入 → 思考 → 输出 → 反馈 → 模型升级',
-   ph:'本月判断准确率趋势：___\n信息源质量变化：___\n新的可迁移模型：___',rows:5},
-  {id:'fw2',label:'作品飞轮',desc:'能力 → 项目 → 作品 → 展示 → 机会',
-   ph:'本月产出了什么作品：___\n是否在积累（还是发了就散）：___',rows:4},
-  {id:'fw3',label:'信用飞轮',desc:'承诺 → 交付 → 超预期 → 信任 → 更大机会',
-   ph:'超预期交付的事：___\n信任和口碑在增强吗：___',rows:4},
-  {id:'fw4',label:'基础设施',desc:'身体 · 情绪 · 工作流 · 方向',
-   ph:'工作流是否更高效了：___\n身体和情绪状态：___\n方向还对吗：___',rows:5},
-  {id:'fw5',label:'下月目标',desc:'一句话，不要多',
-   ph:'下个月，我要……',rows:2},
+  {id:'fw1',label:'认知飞轮',desc:'输入 → 思考 → 输出 → 反馈 → 模型升级',ph:'本月判断准确率趋势：___\n信息源质量变化：___\n新的可迁移模型：___',rows:5},
+  {id:'fw2',label:'作品飞轮',desc:'能力 → 项目 → 作品 → 展示 → 机会',ph:'本月产出了什么作品：___\n是否在积累：___',rows:4},
+  {id:'fw3',label:'信用飞轮',desc:'承诺 → 交付 → 超预期 → 信任 → 更大机会',ph:'超预期交付的事：___\n信任在增强吗：___',rows:4},
+  {id:'fw4',label:'基础设施',desc:'身体 · 情绪 · 工作流 · 方向',ph:'工作流是否更高效：___\n身体和情绪状态：___\n方向还对吗：___',rows:5},
+  {id:'fw5',label:'下月目标',desc:'一句话，不要多',ph:'下个月，我要……',rows:2},
 ];
 
-// ── Render ──
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function collect(){
-  const r={};
-  document.querySelectorAll('textarea[data-id]').forEach(t=>{ r[t.dataset.id]=t.value; });
-  return r;
+// ── Quotes ──
+const QUOTES=[
+  {t:'复利不是每天努力一点，而是每天让系统变好一点。'},
+  {t:'输出才是真正的学习。写下来，才算想清楚了。'},
+  {t:'判断力是AI时代最稀缺的能力。每一个判断都在训练你的系统。'},
+  {t:'认知飞轮：输入 → 思考 → 输出 → 反馈 → 模型升级。今天转了几圈？'},
+  {t:'有效增量不是「学了什么」，而是「因此改变了什么」。'},
+  {t:'本能是生命的燃料，熏习是驾驭燃料的技术。'},
+  {t:'天行健，君子以自强不息。',s:'《易经》'},
+  {t:'今天种下的种子，是明天行动的质量。'},
+  {t:'熵增是默认状态，复盘是主动对抗熵增的武器。'},
+  {t:'你不需要每天都很厉害，你只需要今天让系统比昨天好一点。'},
+  {t:'三个飞轮同时转，复利效应才会出现。'},
+  {t:'信用飞轮：超预期交付一次，比说一百次厉害更有用。'},
+];
+function todayQuote(){
+  const d=new Date();
+  const i=(d.getFullYear()*366+d.getMonth()*31+d.getDate())%QUOTES.length;
+  return QUOTES[i];
 }
 
+// ── Streak ──
+function calcStreak(){
+  const daily=(loadAll()['daily'])||{};
+  const today=new Date();
+  const todayDone=(e=>(e&&(e.q1||e.q2||e.q3)))(daily[dayKey(today)]);
+  let streak=0;
+  for(let i=todayDone?0:1;i<365;i++){
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    const e=daily[dayKey(d)];
+    if(e&&(e.q1||e.q2||e.q3)) streak++; else break;
+  }
+  return streak;
+}
+
+// ── Helpers ──
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function collect(){ const r={}; document.querySelectorAll('textarea[data-id]').forEach(t=>{r[t.dataset.id]=t.value;}); return r; }
+const hasFill=v=>v&&v.trim().length>0;
+
+// ── Toast ──
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+// ── Render main ──
 function renderMain(){
   const key=activeKey(), entry=getE(S.mode,key);
-  const isPast=S.viewKey && S.viewKey!==nowKey();
+  const isPast=S.viewKey&&S.viewKey!==nowKey();
   const ro=isPast?'readonly':'';
   const ML={daily:'每日复盘',weekly:'每周复盘',monthly:'每月校准'};
   const TL={daily:'5 分钟',weekly:'20 分钟',monthly:'1 小时'};
 
-  let h=`
-    <div class="formula">
-      <div class="eq">个人成长复利 = (认知存量 + 有效增量) × 反馈循环 × 时间 − 熵增损耗</div>
-      <div class="sub">复利不是每天努力一点，而是每天让系统变好一点</div>
-    </div>
-    <div class="sec-head">
-      <div class="sec-title">${ML[S.mode]}</div>
-      <span class="badge">${TL[S.mode]}</span>
-      ${isPast?'<span class="badge past">历史（只读）</span>':''}
-    </div>`;
+  const q=todayQuote();
+  let h=`<div class="quote-band"><div class="quote-text">${q.t}</div>${q.s?`<div class="quote-src">— ${q.s}</div>`:''}</div>`;
+
+  // Status badge
+  let badge='';
+  if(isPast){
+    badge=`<span class="badge badge-past">历史（只读）</span>`;
+  } else if(S.mode==='daily'){
+    const ids=['q1','q2','q3'];
+    const filled=ids.filter(id=>hasFill(entry[id])).length;
+    if(filled===3) badge=`<span class="badge badge-done">✓ 今日已完成</span>`;
+    else if(filled>0) badge=`<span class="badge badge-wip">进行中 ${filled}/3</span>`;
+  }
+
+  // Progress dots
+  let dots='';
+  if(S.mode==='daily'&&!isPast){
+    dots=`<div class="prog-wrap">`+['q1','q2','q3'].map(id=>`<div class="prog-dot ${hasFill(entry[id])?'on':''}" data-dotid="${id}"></div>`).join('')+`</div>`;
+  }
+
+  h+=`<div class="sec-bar"><div class="sec-left"><div class="sec-title">${ML[S.mode]}</div><span class="badge badge-time">${TL[S.mode]}</span>${badge}</div>${dots}</div>`;
 
   if(S.mode!=='monthly'){
     QS[S.mode].forEach(q=>{
-      const v=entry[q.id]||'';
-      h+=`<div class="q-block">
-        <label class="q-label" for="${q.id}">${q.n}. ${q.label}</label>
-        <span class="q-hint">${q.hint}</span>
-        <textarea id="${q.id}" data-id="${q.id}" rows="${q.rows}" placeholder="${q.ph}" ${ro}>${esc(v)}</textarea>
+      const v=entry[q.id]||'', done=hasFill(v);
+      h+=`<div class="q-card ${done?'done':''}" id="card-${q.id}">
+        <div class="q-head"><div class="q-num">${q.n}</div><div class="q-lbl">${q.icon} ${q.label}</div></div>
+        <div class="q-hint">${q.hint}</div>
+        <textarea data-id="${q.id}" rows="${q.rows}" placeholder="${q.ph}" ${ro}>${esc(v)}</textarea>
       </div>`;
     });
   } else {
     FW.forEach(f=>{
       const v=entry[f.id]||'';
-      h+=`<div class="fw-card">
-        <div class="fw-lbl">${f.label}</div>
-        <div class="fw-desc">${f.desc}</div>
-        <textarea data-id="${f.id}" rows="${f.rows}" placeholder="${f.ph}" ${ro}>${esc(v)}</textarea>
-      </div>`;
+      h+=`<div class="fw-card"><div class="fw-tag">${f.label}</div><div class="fw-sub">${f.desc}</div><textarea data-id="${f.id}" rows="${f.rows}" placeholder="${f.ph}" ${ro}>${esc(v)}</textarea></div>`;
     });
   }
 
-  h+=`<div class="bot">
+  h+=`<div class="bot"><div class="bot-hint">${isPast?'只读模式':'输入后自动保存'}</div><div class="btn-row">
     ${isPast
       ?`<button class="btn" id="backBtn">↩ 回到今天</button>`
-      :`<button class="btn pri" id="saveBtn">保存</button>`}
-  </div>`;
+      :`<button class="btn" id="exportBtn">导出</button><button class="btn pri" id="saveBtn">保存</button>`}
+  </div></div>`;
 
   document.getElementById('main').innerHTML=h;
 
   if(!isPast){
-    document.getElementById('saveBtn')?.addEventListener('click',manualSave);
-    document.querySelectorAll('textarea[data-id]').forEach(t=>t.addEventListener('input',debounceSave));
+    document.getElementById('saveBtn').addEventListener('click',manualSave);
+    document.getElementById('exportBtn').addEventListener('click',exportMd);
+    document.querySelectorAll('textarea[data-id]').forEach(ta=>{
+      ta.addEventListener('input',()=>{
+        const card=document.getElementById('card-'+ta.dataset.id);
+        if(card) card.classList.toggle('done',hasFill(ta.value));
+        if(S.mode==='daily') refreshDots();
+        debounceSave();
+      });
+    });
   } else {
-    document.getElementById('backBtn')?.addEventListener('click',()=>{ S.viewKey=null; refresh(); });
+    document.getElementById('backBtn').addEventListener('click',()=>{ S.viewKey=null; refresh(); });
   }
-  setSave(isPast?'ro':'');
 }
 
+function refreshDots(){
+  ['q1','q2','q3'].forEach(id=>{
+    const dot=document.querySelector(`.prog-dot[data-dotid="${id}"]`);
+    const ta=document.querySelector(`textarea[data-id="${id}"]`);
+    if(dot&&ta) dot.classList.toggle('on',hasFill(ta.value));
+  });
+}
+
+// ── Sidebar ──
 function renderSidebar(){
   const all=loadAll(), mdata=all[S.mode]||{};
   const keys=Object.keys(mdata).sort().reverse();
   const cur=activeKey(), el=document.getElementById('hiList');
   const ML={daily:'每日',weekly:'每周',monthly:'每月'};
-  if(!keys.length){ el.innerHTML='<div class="empty">还没有记录</div>'; return; }
-  el.innerHTML=keys.map(k=>`
-    <div class="hi-item ${k===cur?'on':''}" data-k="${k}">
-      <div class="hi-date">${fmtKey(k)}</div>
-      <div class="hi-mode">${ML[S.mode]}</div>
-    </div>`).join('');
+  if(!keys.length){ el.innerHTML='<div class="hi-empty">还没有记录</div>'; return; }
+  el.innerHTML=keys.map(k=>`<div class="hi-item ${k===cur?'on':''}" data-k="${k}"><div class="hi-date">${fmtKey(k)}</div><div class="hi-mode">${ML[S.mode]}</div></div>`).join('');
   el.querySelectorAll('.hi-item').forEach(it=>{
     it.addEventListener('click',()=>{ S.viewKey=it.dataset.k===nowKey()?null:it.dataset.k; refresh(); });
   });
 }
 
+// ── Streak ──
+function renderStreak(){
+  const s=calcStreak(), el=document.getElementById('streakEl');
+  if(!el) return;
+  if(s===0){ el.textContent='开始打卡吧'; el.className='streak'; }
+  else { el.textContent=`🔥 ${s}天连续`; el.className='streak hot'; }
+}
+
+// ── Refresh ──
 function refresh(){
   document.getElementById('dateChip').textContent=fmtKey(activeKey());
-  renderMain();
+  renderMain(); renderStreak();
   if(S.sbOpen) renderSidebar();
 }
 
 // ── Save ──
 function manualSave(){
-  setE(S.mode,activeKey(),collect());
-  setSave('ok');
+  const data=collect();
+  setE(S.mode,activeKey(),data);
+  renderStreak();
   if(S.sbOpen) renderSidebar();
+  toast('✓ 已保存');
+  // Check completion for daily
+  if(S.mode==='daily'&&!S.viewKey){
+    const e=getE(S.mode,activeKey());
+    if(['q1','q2','q3'].every(id=>hasFill(e[id]))){
+      setTimeout(()=>{ const b=document.querySelector('.badge-wip'); if(b){ b.className='badge badge-done'; b.textContent='✓ 今日已完成'; }},100);
+    }
+  }
 }
+
 function debounceSave(){
-  setSave('saving');
   clearTimeout(S.timer);
-  S.timer=setTimeout(manualSave,700);
+  S.timer=setTimeout(()=>{ setE(S.mode,activeKey(),collect()); renderStreak(); if(S.sbOpen) renderSidebar(); },900);
 }
-function setSave(st){
-  const el=document.getElementById('saveLbl'); if(!el) return;
-  if(st==='ok'){ el.textContent='已保存 ✓'; el.className='save-lbl ok'; }
-  else if(st==='saving'){ el.textContent='保存中…'; el.className='save-lbl'; }
-  else if(st==='ro'){ el.textContent='只读'; el.className='save-lbl'; }
-  else { el.textContent=''; el.className='save-lbl'; }
+
+// ── Export ──
+function exportMd(){
+  const all=loadAll();
+  const lines=['# 成长复盘导出','',`导出时间：${dayKey()}`,''];
+  const daily=all['daily']||{};
+  const dk=Object.keys(daily).sort();
+  if(dk.length){ lines.push('---','## 每日记录','');
+    dk.forEach(k=>{ const e=daily[k]; lines.push(`### ${fmtKey(k)}`,'');
+      if(e.q1) lines.push('**有效增量**','',e.q1,'');
+      if(e.q2) lines.push('**判断记录**','',e.q2,'');
+      if(e.q3) lines.push('**今日输出**','',e.q3,''); }); }
+  const weekly=all['weekly']||{};
+  const wk=Object.keys(weekly).sort();
+  if(wk.length){ lines.push('---','## 每周记录','');
+    wk.forEach(k=>{ const e=weekly[k]; lines.push(`### ${fmtKey(k)}`,'');
+      [['q1','有效存量'],['q2','判断复盘'],['q3','可复用产出'],['q4','熵增来源'],['q5','下周']].forEach(([id,lab])=>{ if(e[id]) lines.push(`**${lab}**`,'',e[id],''); }); }); }
+  const monthly=all['monthly']||{};
+  const mk=Object.keys(monthly).sort();
+  if(mk.length){ lines.push('---','## 每月记录','');
+    mk.forEach(k=>{ const e=monthly[k]; lines.push(`### ${fmtKey(k)}`,'');
+      [['fw1','认知飞轮'],['fw2','作品飞轮'],['fw3','信用飞轮'],['fw4','基础设施'],['fw5','下月目标']].forEach(([id,lab])=>{ if(e[id]) lines.push(`**${lab}**`,'',e[id],''); }); }); }
+  if(!dk.length&&!wk.length&&!mk.length){ toast('还没有记录可导出'); return; }
+  const blob=new Blob([lines.join('\n')],{type:'text/markdown;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`复盘记录_${dayKey()}.md`; a.click(); URL.revokeObjectURL(a.href);
+  toast('✓ 已下载');
 }
 
 // ── Controls ──
 document.querySelectorAll('.tab').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on');
-    S.mode=b.dataset.m; S.viewKey=null;
+    b.classList.add('on'); S.mode=b.dataset.m; S.viewKey=null;
     refresh(); if(S.sbOpen) renderSidebar();
   });
 });
-
 document.getElementById('histBtn').addEventListener('click',()=>{
   S.sbOpen=!S.sbOpen;
   document.getElementById('sidebar').classList.toggle('open',S.sbOpen);
   document.getElementById('histBtn').textContent=S.sbOpen?'关闭':'历史';
   if(S.sbOpen) renderSidebar();
 });
-
-// ── Export ──
-function exportMd(){
-  const all=loadAll();
-  const lines=['# 成长复盘导出','',`导出时间：${dayKey()}`,`个人成长复利 = (认知存量 + 有效增量) × 反馈循环 × 时间 − 熵增损耗`,''];
-
-  // Daily
-  const daily=all['daily']||{};
-  const dkeys=Object.keys(daily).sort();
-  if(dkeys.length){
-    lines.push('---','## 每日记录','');
-    dkeys.forEach(k=>{
-      const e=daily[k];
-      lines.push(`### ${fmtKey(k)}`,'');
-      if(e.q1){ lines.push('**有效增量**','',e.q1,''); }
-      if(e.q2){ lines.push('**判断记录**','',e.q2,''); }
-      if(e.q3){ lines.push('**今日输出**','',e.q3,''); }
-    });
-  }
-
-  // Weekly
-  const weekly=all['weekly']||{};
-  const wkeys=Object.keys(weekly).sort();
-  if(wkeys.length){
-    lines.push('---','## 每周记录','');
-    wkeys.forEach(k=>{
-      const e=weekly[k];
-      lines.push(`### ${fmtKey(k)}`,'');
-      if(e.q1){ lines.push('**本周有效存量**','',e.q1,''); }
-      if(e.q2){ lines.push('**判断复盘**','',e.q2,''); }
-      if(e.q3){ lines.push('**可复用产出**','',e.q3,''); }
-      if(e.q4){ lines.push('**熵增来源**','',e.q4,''); }
-      if(e.q5){ lines.push('**下周**','',e.q5,''); }
-    });
-  }
-
-  // Monthly
-  const monthly=all['monthly']||{};
-  const mkeys=Object.keys(monthly).sort();
-  if(mkeys.length){
-    lines.push('---','## 每月记录','');
-    mkeys.forEach(k=>{
-      const e=monthly[k];
-      lines.push(`### ${fmtKey(k)}`,'');
-      if(e.fw1){ lines.push('**认知飞轮**','',e.fw1,''); }
-      if(e.fw2){ lines.push('**作品飞轮**','',e.fw2,''); }
-      if(e.fw3){ lines.push('**信用飞轮**','',e.fw3,''); }
-      if(e.fw4){ lines.push('**基础设施**','',e.fw4,''); }
-      if(e.fw5){ lines.push('**下月目标**','',e.fw5,''); }
-    });
-  }
-
-  if(dkeys.length+wkeys.length+mkeys.length===0){
-    alert('还没有任何记录可以导出。'); return;
-  }
-
-  const blob=new Blob([lines.join('\n')],{type:'text/markdown;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`复盘记录_${dayKey()}.md`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-document.getElementById('exportBtn').addEventListener('click', exportMd);
 
 // ── Boot ──
 refresh();
