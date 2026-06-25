@@ -374,7 +374,7 @@ function renderMain(){
 
   h+=`<div class="bot"><div class="bot-hint">${isPast?'只读模式':'输入后自动保存'}</div><div class="btn-row">
     ${isPast
-      ?`<button class="btn" id="backBtn">↩ 回到今天</button>`
+      ?`<button class="btn" id="exportSingleBtn">导出此条</button><button class="btn" id="backBtn">↩ 回到今天</button>`
       :`<button class="btn" id="exportBtn">导出</button><button class="btn pri" id="saveBtn">保存</button>`}
   </div></div>`;
 
@@ -400,6 +400,7 @@ function renderMain(){
     });
   } else {
     document.getElementById('backBtn').addEventListener('click',()=>{ S.viewKey=null; refresh(); });
+    document.getElementById('exportSingleBtn').addEventListener('click',()=>exportSingle(S.mode, activeKey()));
   }
 }
 
@@ -487,6 +488,31 @@ function buildExportText(){
 }
 
 function isWeChat(){ return /MicroMessenger/i.test(navigator.userAgent); }
+
+function exportSingle(mode, key){
+  const e = getE(mode, key);
+  const lines = [`# 复盘记录 · ${fmtKey(key)}`, ''];
+  if(mode==='daily'){
+    if(e.q1) lines.push('**有效增量**','',e.q1,'');
+    if(e.q2) lines.push('**判断记录**','',e.q2,'');
+    if(e.q3) lines.push('**今日输出**','',e.q3,'');
+  } else if(mode==='weekly'){
+    [['q1','有效存量'],['q2','判断复盘'],['q3','可复用产出'],['q4','熵增来源'],['q5','下周']].forEach(([id,lab])=>{ if(e[id]) lines.push(`**${lab}**`,'',e[id],''); });
+  } else {
+    [['fw1','认知飞轮'],['fw2','作品飞轮'],['fw3','信用飞轮'],['fw4','基础设施'],['fw5','下月目标']].forEach(([id,lab])=>{ if(e[id]) lines.push(`**${lab}**`,'',e[id],''); });
+  }
+  const hasContent = lines.length > 2;
+  if(!hasContent){ toast('这条记录没有内容'); return; }
+  const text = lines.join('\n');
+  if(isWeChat()){
+    showExportModal(text);
+  } else {
+    const blob = new Blob([text],{type:'text/markdown;charset=utf-8'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `复盘_${key}.md`; a.click(); URL.revokeObjectURL(a.href);
+    toast('✓ 已下载');
+  }
+}
 
 function exportMd(){
   const {text, empty} = buildExportText();
