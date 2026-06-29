@@ -515,14 +515,27 @@ function exportSingle(mode, key){
 }
 
 function exportMd(){
-  const {text, empty} = buildExportText();
-  if(empty){ toast('还没有记录可导出'); return; }
+  // 只导出当前这一条记录（合并已保存内容与当前未保存的输入）
+  const key = activeKey();
+  const entry = Object.assign({}, getE(S.mode, key), collect());
+  const lines = [`# 复盘记录 · ${fmtKey(key)}`, ''];
+  if(S.mode==='daily'){
+    if(hasFill(entry.q1)) lines.push('**有效增量**','',entry.q1,'');
+    if(hasFill(entry.q2)) lines.push('**判断记录**','',entry.q2,'');
+    if(hasFill(entry.q3)) lines.push('**今日输出**','',entry.q3,'');
+  } else if(S.mode==='weekly'){
+    [['q1','有效存量'],['q2','判断复盘'],['q3','可复用产出'],['q4','熵增来源'],['q5','下周']].forEach(([id,lab])=>{ if(hasFill(entry[id])) lines.push(`**${lab}**`,'',entry[id],''); });
+  } else {
+    [['fw1','认知飞轮'],['fw2','作品飞轮'],['fw3','信用飞轮'],['fw4','基础设施'],['fw5','下月目标']].forEach(([id,lab])=>{ if(hasFill(entry[id])) lines.push(`**${lab}**`,'',entry[id],''); });
+  }
+  if(lines.length <= 2){ toast('还没有记录可导出'); return; }
+  const text = lines.join('\n');
   if(isWeChat()){
     showExportModal(text);
   } else {
     const blob=new Blob([text],{type:'text/markdown;charset=utf-8'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download=`复盘记录_${dayKey()}.md`; a.click(); URL.revokeObjectURL(a.href);
+    a.download=`复盘_${key}.md`; a.click(); URL.revokeObjectURL(a.href);
     toast('✓ 已下载');
   }
 }
